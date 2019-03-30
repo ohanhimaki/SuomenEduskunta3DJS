@@ -3,7 +3,6 @@
   <head>
     <style>
       .bar {
-        fill: steelblue;
       }
     </style>
     <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -27,7 +26,7 @@
         document.getElementById("CurrentYear").innerHTML = year;
       }
 
-      var year = 1;
+      var year = 2;
       var svg = d3.select("svg"),
         margin = 200,
         width = svg.attr("width") - margin,
@@ -54,7 +53,7 @@
           data.forEach(function(d) {
             var i = 0;
             while (i < data.columns.length) {
-              if (i > 0) {
+              if (i > 1) {
                 d[data.columns[i]] = +d[data.columns[i]];
               }
 
@@ -78,10 +77,10 @@
             })
           );
           xScale.domain([
+            0,
             d3.max(topOfSortedData, function(d) {
               return d[data.columns[year]];
-            }),
-            0
+            })
           ]);
 
           g.append("g")
@@ -104,9 +103,14 @@
               return yScale(d.Vaalit);
             })
             .attr("width", function(d) {
-              return width - xScale(d[data.columns[year]]);
+              return xScale(d[data.columns[year]]);
             })
-            .attr("height", yScale.bandwidth());
+            .attr("height", yScale.bandwidth())
+            .attr("fill", function(d) {
+              console.log(d);
+              console.log(d[data.columns[1]]);
+              return "#" + d[data.columns[1]];
+            });
         });
       }
 
