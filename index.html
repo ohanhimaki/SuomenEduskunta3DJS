@@ -63,14 +63,12 @@
           });
 
           var datasorted = data.sort(function(a, b) {
-            return b[data.columns[year]] - a[data.columns[year]];
+            return a[data.columns[year]] - b[data.columns[year]];
           });
-          var topOfSortedData = datasorted.slice(0, 10);
 
-          topOfSortedData = topOfSortedData.filter(function(d) {
+          var topOfSortedData = datasorted.filter(function(d) {
             return d[data.columns[year]] != 0;
           });
-          console.log(topOfSortedData);
 
           // data.sort((a, b) => data.columns[year] - data.columns[year]);
 
@@ -80,10 +78,10 @@
             })
           );
           xScale.domain([
-            0,
             d3.max(topOfSortedData, function(d) {
               return d[data.columns[year]];
-            })
+            }),
+            0
           ]);
 
           g.append("g")
@@ -101,16 +99,14 @@
             .enter()
             .append("rect")
             .attr("class", "bar")
-            .attr("x", function(d) {
-              return xScale(d.Vaalit);
-            })
+            .attr("x", 0)
             .attr("y", function(d) {
-              return yScale(d[data.columns[year]]);
+              return yScale(d.Vaalit);
             })
-            .attr("width", xScale.bandwidth())
-            .attr("height", function(d) {
-              return height - yScale(d[data.columns[year]]);
-            });
+            .attr("width", function(d) {
+              return width - xScale(d[data.columns[year]]);
+            })
+            .attr("height", yScale.bandwidth());
         });
       }
 
