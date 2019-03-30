@@ -27,7 +27,7 @@
         document.getElementById("CurrentYear").innerHTML = year;
       }
 
-      var year = 10;
+      var year = 1;
       var svg = d3.select("svg"),
         margin = 200,
         width = svg.attr("width") - margin,
@@ -51,7 +51,6 @@
           if (error) {
             throw error;
           }
-          console.log(data);
           data.forEach(function(d) {
             var i = 0;
             while (i < data.columns.length) {
@@ -63,14 +62,26 @@
             }
           });
 
+          var datasorted = data.sort(function(a, b) {
+            return b[data.columns[year]] - a[data.columns[year]];
+          });
+          var topOfSortedData = datasorted.slice(0, 10);
+
+          topOfSortedData = topOfSortedData.filter(function(d) {
+            return d[data.columns[year]] != 0;
+          });
+          console.log(topOfSortedData);
+
+          // data.sort((a, b) => data.columns[year] - data.columns[year]);
+
           xScale.domain(
-            data.map(function(d) {
+            topOfSortedData.map(function(d) {
               return d.Vaalit;
             })
           );
           yScale.domain([
             0,
-            d3.max(data, function(d) {
+            d3.max(topOfSortedData, function(d) {
               return d[data.columns[year]];
             })
           ]);
@@ -86,7 +97,7 @@
           );
 
           g.selectAll(".bar")
-            .data(data)
+            .data(topOfSortedData)
             .enter()
             .append("rect")
             .attr("class", "bar")
@@ -102,6 +113,7 @@
             });
         });
       }
+
       loadData();
     </script>
   </body>

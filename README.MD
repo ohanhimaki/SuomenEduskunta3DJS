@@ -7,6 +7,7 @@ https://wikitable2csv.ggor.de/
 ## Tutorials and other links
 
 https://www.tutorialsteacher.com/d3js/create-bar-chart-using-d3js
+http://next.plnkr.co/edit/z8WdSry2349xassr2mtj?utm_source=legacy&utm_medium=worker&utm_campaign=next&preview
 
 ## Problems
 
