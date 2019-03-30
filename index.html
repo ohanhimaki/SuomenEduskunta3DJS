@@ -19,8 +19,30 @@
       .attr("transform", "translate(" + 100 + "," + 100 + ")");
 
     //READ CSV
-    d3.csv("PaikkaJako.csv", function(data) {
+    d3.csv("testi.csv", function(data) {
       console.log(data);
+
+      xScale.domain(data.year);
+      yScale.domain([0, d3.max(data.value)]);
+
+      g.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(xScale));
+
+      g.append("g")
+        .call(
+          d3
+            .axisLeft(yScale)
+            .tickFormat(function(d) {
+              return "$" + d;
+            })
+            .ticks(10)
+        )
+        .append("text")
+        .attr("y", 6)
+        .attr("dy", "0.71em")
+        .attr("text-anchor", "end")
+        .text("value");
     });
   </script>
 </body>
