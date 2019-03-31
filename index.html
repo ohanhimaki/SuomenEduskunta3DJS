@@ -18,12 +18,10 @@
       function prev() {
         year--;
         loadData();
-        document.getElementById("CurrentYear").innerHTML = year;
       }
       function next() {
         year++;
         loadData();
-        document.getElementById("CurrentYear").innerHTML = year;
       }
 
       var year = 2;
@@ -61,6 +59,7 @@
             }
           });
 
+          document.getElementById("CurrentYear").innerHTML = data.columns[year];
           var datasorted = data.sort(function(a, b) {
             return a[data.columns[year]] - b[data.columns[year]];
           });
@@ -102,13 +101,13 @@
             .attr("y", function(d) {
               return yScale(d.Vaalit);
             })
+            .transition()
+            .duration(400)
             .attr("width", function(d) {
               return xScale(d[data.columns[year]]);
             })
             .attr("height", yScale.bandwidth())
             .attr("fill", function(d) {
-              console.log(d);
-              console.log(d[data.columns[1]]);
               return "#" + d[data.columns[1]];
             });
         });
