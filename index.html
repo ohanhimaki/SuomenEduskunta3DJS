@@ -40,7 +40,7 @@
       var testi = 0;
       var year = 2;
       var svg = d3.select("svg"),
-        margin = 200,
+        margin = 220,
         width = svg.attr("width") - margin,
         height = svg.attr("height") - margin;
       var data = [];
@@ -207,8 +207,17 @@
           .attr("y", function(d) {
             return yScale(d.Vaalit) + 0.5 * yScale.bandwidth();
           })
-          .text(function(d) {
-            return d[data.columns[year]];
+          .tween("text", function(d) {
+            var node = this;
+            //keep a reference to 'this'
+            var i = d3.interpolateRound(
+              node.textContent,
+              d[data.columns[year]]
+            );
+            return function(t) {
+              node.textContent = i(t);
+              //use that reference in the inner function
+            };
           });
         //NEW LABELS
 
@@ -216,6 +225,7 @@
           .enter()
           .append("text")
           .attr("class", "label")
+          .text(0)
           .attr("x", function(d) {
             return 5 + xScale(d[data.columns[year]]);
           })
@@ -226,8 +236,17 @@
           .attr("text-anchor", "start")
           .transition()
           .duration(400)
-          .text(function(d) {
-            return d[data.columns[year]];
+          .tween("text", function(d) {
+            var node = this;
+            //keep a reference to 'this'
+            var i = d3.interpolateRound(
+              node.textContent,
+              d[data.columns[year]]
+            );
+            return function(t) {
+              node.textContent = i(t);
+              //use that reference in the inner function
+            };
           });
 
         // REMOVE LABELS
