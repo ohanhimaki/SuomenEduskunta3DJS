@@ -1,10 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <style>
-      .bar {
-      }
-    </style>
+    <style></style>
     <script src="https://d3js.org/d3.v4.min.js"></script>
   </head>
   <body>
@@ -29,6 +26,7 @@
         margin = 200,
         width = svg.attr("width") - margin,
         height = svg.attr("height") - margin;
+      var data = [];
       document.getElementById("CurrentYear").innerHTML = year;
       var yScale = d3
           .scaleBand()
@@ -42,8 +40,6 @@
 
       //Load CSV
       function loadData() {
-        d3.selectAll(".tick").remove();
-        d3.selectAll(".bar").remove();
         d3.csv("PaikkaJako.csv", function(error, data) {
           if (error) {
             throw error;
@@ -58,59 +54,61 @@
               i++;
             }
           });
-
-          document.getElementById("CurrentYear").innerHTML = data.columns[year];
-          var datasorted = data.sort(function(a, b) {
-            return a[data.columns[year]] - b[data.columns[year]];
-          });
-
-          var topOfSortedData = datasorted.filter(function(d) {
-            return d[data.columns[year]] != 0;
-          });
-
-          // data.sort((a, b) => data.columns[year] - data.columns[year]);
-
-          yScale.domain(
-            topOfSortedData.map(function(d) {
-              return d.Vaalit;
-            })
-          );
-          xScale.domain([
-            0,
-            d3.max(topOfSortedData, function(d) {
-              return d[data.columns[year]];
-            })
-          ]);
-
-          g.append("g")
-            .attr("transform", "translate(0," + height + ")")
-            .call(d3.axisBottom(xScale));
-
-          g.append("g").call(
-            d3.axisLeft(yScale).tickFormat(function(d) {
-              return d;
-            })
-          );
-
-          g.selectAll(".bar")
-            .data(topOfSortedData)
-            .enter()
-            .append("rect")
-            .attr("class", "bar")
-            .attr("x", 0)
-            .attr("y", function(d) {
-              return yScale(d.Vaalit);
-            })
-            .transition()
-            .duration(400)
-            .attr("width", function(d) {
-              return xScale(d[data.columns[year]]);
-            })
-            .attr("height", yScale.bandwidth())
-            .attr("fill", function(d) {
-              return "#" + d[data.columns[1]];
-            });
         });
+      }
+
+      function drawGraph() {
+        document.getElementById("CurrentYear").innerHTML = data.columns[year];
+        var datasorted = data.sort(function(a, b) {
+          return a[data.columns[year]] - b[data.columns[year]];
+        });
+
+        var topOfSortedData = datasorted.filter(function(d) {
+          return d[data.columns[year]] != 0;
+        });
+
+        // data.sort((a, b) => data.columns[year] - data.columns[year]);
+
+        yScale.domain(
+          topOfSortedData.map(function(d) {
+            return d.Vaalit;
+          })
+        );
+        xScale.domain([
+          0,
+          d3.max(topOfSortedData, function(d) {
+            return d[data.columns[year]];
+          })
+        ]);
+
+        g.append("g")
+          .attr("transform", "translate(0," + height + ")")
+          .call(d3.axisBottom(xScale));
+
+        g.append("g").call(
+          d3.axisLeft(yScale).tickFormat(function(d) {
+            return d;
+          })
+        );
+
+        g.selectAll(".bar")
+          .data(topOfSortedData)
+          .enter()
+          .append("rect")
+          .attr("class", "bar")
+          .attr("x", 0)
+          .attr("y", function(d) {
+            return yScale(d.Vaalit);
+          })
+          .transition()
+          .duration(400)
+          .attr("width", function(d) {
+            return xScale(d[data.columns[year]]);
+          })
+          .attr("height", yScale.bandwidth())
+          .attr("fill", function(d) {
+            return "#" + d[data.columns[1]];
+          });
       }
 
       loadData();
