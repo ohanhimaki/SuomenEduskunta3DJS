@@ -3,17 +3,24 @@
   <head>
     <style>
       .label {
-        font-size: 40px;
+        font-size: 35px;
+      }
+      .tick {
+        font-size: 20px;
+      }
+      .YearTitle {
+        text-align: center;
+        font-size: 35px;
       }
     </style>
     <script src="https://d3js.org/d3.v4.min.js"></script>
   </head>
   <body>
-    <svg width="900" height="800"></svg>
+    <svg width="1000" height="800"></svg>
 
-    <div id="CurrentYear"></div>
     <button onclick="prev()">prev</button>
     <button onclick="next()">next</button>
+    <button onclick="play()">Play</button>
     <script>
       //Declare and calculate margins.
       function prev() {
@@ -24,6 +31,12 @@
         year++;
         drawGraph();
       }
+      function play() {
+        window.setInterval(function() {
+          year++;
+          drawGraph();
+        }, 2500);
+      }
       var testi = 0;
       var year = 2;
       var svg = d3.select("svg"),
@@ -31,7 +44,7 @@
         width = svg.attr("width") - margin,
         height = svg.attr("height") - margin;
       var data = [];
-      document.getElementById("CurrentYear").innerHTML = year;
+
       var yScale = d3
           .scaleBand()
           .range([height, 0])
@@ -40,7 +53,7 @@
 
       var g = svg
         .append("g")
-        .attr("transform", "translate(" + 100 + "," + 100 + ")");
+        .attr("transform", "translate(" + 150 + "," + 100 + ")");
 
       //Load CSV
       function loadData() {
@@ -65,7 +78,12 @@
       }
 
       function drawGraph() {
-        document.getElementById("CurrentYear").innerHTML = data.columns[year];
+        g.selectAll(".YearTitle").remove();
+        g.append("text")
+          .attr("class", "YearTitle")
+          .attr("y", -20)
+          .text("Suomen eduskunta vuonna:" + data.columns[year]);
+
         var datasorted = data.sort(function(a, b) {
           return a[data.columns[year]] - b[data.columns[year]];
         });
@@ -128,7 +146,7 @@
             return d.Vaalit;
           })
           .attr("class", "bar");
-        // UPDATE
+        // UPDATE BARS
         bars
           .transition()
           .duration(600)
@@ -163,7 +181,57 @@
           });
 
         //REMOVE BARS
+
         bars
+          .exit()
+          .transition()
+          .duration(600)
+          .attr("y", 1000)
+          .remove();
+
+        //LABELS
+        var labels = g
+          .selectAll(".label")
+          .data(topOfSortedData, function(d) {
+            return d.Vaalit;
+          })
+          .attr("class", "label");
+
+        // UPDATE LABELS
+        labels
+          .transition()
+          .duration(600)
+          .attr("x", function(d) {
+            return 5 + xScale(d[data.columns[year]]);
+          })
+          .attr("y", function(d) {
+            return yScale(d.Vaalit) + 0.5 * yScale.bandwidth();
+          })
+          .text(function(d) {
+            return d[data.columns[year]];
+          });
+        //NEW LABELS
+
+        labels
+          .enter()
+          .append("text")
+          .attr("class", "label")
+          .attr("x", function(d) {
+            return 5 + xScale(d[data.columns[year]]);
+          })
+          .attr("y", function(d) {
+            return yScale(d.Vaalit) + 0.5 * yScale.bandwidth();
+          })
+          .attr("dy", ".35em")
+          .attr("text-anchor", "start")
+          .transition()
+          .duration(400)
+          .text(function(d) {
+            return d[data.columns[year]];
+          });
+
+        // REMOVE LABELS
+        labels
           .exit()
           .transition()
           .duration(600)
