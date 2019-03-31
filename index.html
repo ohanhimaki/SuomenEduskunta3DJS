@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <style></style>
+    <style>
+      .label {
+        font-size: 40px;
+      }
+    </style>
     <script src="https://d3js.org/d3.v4.min.js"></script>
   </head>
   <body>
@@ -31,7 +35,7 @@
       var yScale = d3
           .scaleBand()
           .range([height, 0])
-          .padding(0.4),
+          .padding(0),
         xScale = d3.scaleLinear().range([0, width]);
 
       var g = svg
@@ -69,8 +73,6 @@
         var topOfSortedData = datasorted.filter(function(d) {
           return d[data.columns[year]] != 0;
         });
-
-        // data.sort((a, b) => data.columns[year] - data.columns[year]);
 
         yScale.domain(
           topOfSortedData.map(function(d) {
@@ -119,11 +121,14 @@
             );
         }
 
+        // BARS
         var bars = g
           .selectAll(".bar")
-          .data(topOfSortedData)
+          .data(topOfSortedData, function(d) {
+            return d.Vaalit;
+          })
           .attr("class", "bar");
-
+        // UPDATE
         bars
           .transition()
           .duration(600)
@@ -131,7 +136,6 @@
           .attr("y", function(d) {
             return yScale(d.Vaalit);
           })
-
           .attr("width", function(d) {
             return xScale(d[data.columns[year]]);
           })
@@ -139,7 +143,7 @@
           .attr("fill", function(d) {
             return "#" + d[data.columns[1]];
           });
-
+        // CREATE NEW BARS
         bars
           .enter()
           .append("rect")
@@ -157,6 +161,8 @@
           .attr("fill", function(d) {
             return "#" + d[data.columns[1]];
           });
+
+        //REMOVE BARS
         bars
           .exit()
           .transition()
