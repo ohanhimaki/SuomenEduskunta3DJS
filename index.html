@@ -14,11 +14,11 @@
       //Declare and calculate margins.
       function prev() {
         year--;
-        loadData();
+        drawGraph();
       }
       function next() {
         year++;
-        loadData();
+        drawGraph();
       }
 
       var year = 2;
@@ -40,24 +40,29 @@
 
       //Load CSV
       function loadData() {
-        d3.csv("PaikkaJako.csv", function(error, data) {
+        d3.csv("PaikkaJako.csv", function(error, rows) {
           if (error) {
             throw error;
           }
-          data.forEach(function(d) {
+          rows.forEach(function(d) {
             var i = 0;
-            while (i < data.columns.length) {
+            while (i < rows.columns.length) {
               if (i > 1) {
-                d[data.columns[i]] = +d[data.columns[i]];
+                d[rows.columns[i]] = +d[rows.columns[i]];
               }
 
               i++;
             }
           });
+
+          data = rows;
+          drawGraph();
         });
       }
 
       function drawGraph() {
+        d3.selectAll(".tick").remove();
+        d3.selectAll(".bar").remove();
         document.getElementById("CurrentYear").innerHTML = data.columns[year];
         var datasorted = data.sort(function(a, b) {
           return a[data.columns[year]] - b[data.columns[year]];
