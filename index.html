@@ -61,7 +61,6 @@
       }
 
       function drawGraph() {
-        d3.selectAll(".bar").remove();
         document.getElementById("CurrentYear").innerHTML = data.columns[year];
         var datasorted = data.sort(function(a, b) {
           return a[data.columns[year]] - b[data.columns[year]];
@@ -108,11 +107,11 @@
         } else {
           g.selectAll(".x.axis")
             .transition()
-            .duration(1500)
+            .duration(600)
             .call(d3.axisBottom(xScale));
           g.selectAll(".y.axis")
             .transition()
-            .duration(1500)
+            .duration(600)
             .call(
               d3.axisLeft(yScale).tickFormat(function(d) {
                 return d;
@@ -120,8 +119,28 @@
             );
         }
 
-        g.selectAll(".bar")
+        var bars = g
+          .selectAll(".bar")
           .data(topOfSortedData)
+          .attr("class", "bar");
+
+        bars
+          .transition()
+          .duration(600)
+          .attr("x", 0)
+          .attr("y", function(d) {
+            return yScale(d.Vaalit);
+          })
+
+          .attr("width", function(d) {
+            return xScale(d[data.columns[year]]);
+          })
+          .attr("height", yScale.bandwidth())
+          .attr("fill", function(d) {
+            return "#" + d[data.columns[1]];
+          });
+
+        bars
           .enter()
           .append("rect")
           .attr("class", "bar")
@@ -138,6 +157,12 @@
           .attr("fill", function(d) {
             return "#" + d[data.columns[1]];
           });
+        bars
+          .exit()
+          .transition()
+          .duration(600)
+          .attr("y", 1000)
+          .remove();
       }
 
       loadData();
