@@ -20,7 +20,7 @@
         year++;
         drawGraph();
       }
-
+      var testi = 0;
       var year = 2;
       var svg = d3.select("svg"),
         margin = 200,
@@ -61,7 +61,6 @@
       }
 
       function drawGraph() {
-        d3.selectAll(".tick").remove();
         d3.selectAll(".bar").remove();
         document.getElementById("CurrentYear").innerHTML = data.columns[year];
         var datasorted = data.sort(function(a, b) {
@@ -85,16 +84,41 @@
             return d[data.columns[year]];
           })
         ]);
+        if (testi < 1) {
+          d3.selectAll(".x.axis").remove();
+          d3.selectAll(".y.axis").remove();
+          g.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .transition()
+            .duration(750)
 
-        g.append("g")
-          .attr("transform", "translate(0," + height + ")")
-          .call(d3.axisBottom(xScale));
+            .call(d3.axisBottom(xScale));
 
-        g.append("g").call(
-          d3.axisLeft(yScale).tickFormat(function(d) {
-            return d;
-          })
-        );
+          g.append("g")
+            .transition()
+            .duration(750)
+            .attr("class", "y axis")
+            .call(
+              d3.axisLeft(yScale).tickFormat(function(d) {
+                return d;
+              })
+            );
+          testi++;
+        } else {
+          g.selectAll(".x.axis")
+            .transition()
+            .duration(1500)
+            .call(d3.axisBottom(xScale));
+          g.selectAll(".y.axis")
+            .transition()
+            .duration(1500)
+            .call(
+              d3.axisLeft(yScale).tickFormat(function(d) {
+                return d;
+              })
+            );
+        }
 
         g.selectAll(".bar")
           .data(topOfSortedData)
