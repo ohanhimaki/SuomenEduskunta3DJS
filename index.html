@@ -8,7 +8,7 @@
       .tick {
         font-size: 20px;
       }
-      .YearTitle {
+      .ChartTitle {
         text-align: center;
         font-size: 35px;
       }
@@ -16,6 +16,17 @@
     <script src="https://d3js.org/d3.v4.min.js"></script>
   </head>
   <body>
+    <div id="settings">
+      <textarea rows="4" cols="25"></textarea>
+
+      <button onclick="">Create chart</button>
+      <input
+        type="file"
+        id="csvFileInput"
+        onchange="readCsv(this)"
+        accept=".csv"
+      />
+    </div>
     <svg width="1000" height="800"></svg>
 
     <button onclick="prev()">prev</button>

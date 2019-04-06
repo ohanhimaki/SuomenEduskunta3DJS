@@ -2,38 +2,42 @@
 const playSpeed = 1000;
 const animationSpeed = 1000;
 
-let testi = 0;
-let year = 2;
+let column = 2;
 let svg = d3.select("svg"),
   margin = 220,
   width = svg.attr("width") - margin,
   height = svg.attr("height") - margin;
 let data = [];
+let datatesti = "";
+let titleStart = "Suomen eduskunta vuonna:";
 
 //Prev button calls this
 function prev() {
-  year--;
+  column--;
   drawGraph();
 }
 //Next button calls this
 function next() {
-  year++;
+  column++;
   drawGraph();
 }
 //Play button calls this
 function play() {
   window.setInterval(function() {
-    year++;
+    column++;
     drawGraph();
   }, playSpeed);
 }
 
+//YAxis
 let yScale = d3
-    .scaleBand()
-    .range([height, 0])
-    .padding(0),
-  xScale = d3.scaleLinear().range([0, width]);
+  .scaleBand()
+  .range([height, 0])
+  .padding(0);
+//XAxis
+let xScale = d3.scaleLinear().range([0, width]);
 
+//translate changes position where graph is drawn, starts from topleft (x,y)
 let g = svg.append("g").attr("transform", "translate(" + 150 + "," + 100 + ")");
 
 //Load CSV
@@ -57,20 +61,36 @@ function loadData() {
     drawGraph();
   });
 }
+//Load csv from imported file
+function readCsv(file) {
+  let reader = new FileReader();
+  reader.onload = function(e) {
+    content = reader.result;
+    importData(content);
+  };
+  reader.readAsBinaryString(file.files[0]);
+}
 
+function importData(csv) {
+  data = d3.csvParse(csv);
+  drawGraph();
+}
+
+//start drawGraph
 function drawGraph() {
-  g.selectAll(".YearTitle").remove();
+  // update chart Title
+  g.selectAll(".ChartTitle").remove();
   g.append("text")
-    .attr("class", "YearTitle")
+    .attr("class", "ChartTitle")
     .attr("y", -20)
-    .text("Suomen eduskunta vuonna:" + data.columns[year]);
+    .text(titleStart + data.columns[column]);
 
   let datasorted = data.sort(function(a, b) {
-    return a[data.columns[year]] - b[data.columns[year]];
+    return a[data.columns[column]] - b[data.columns[column]];
   });
 
   let topOfSortedData = datasorted.filter(function(d) {
-    return d[data.columns[year]] != 0;
+    return d[data.columns[column]] != 0;
   });
 
   yScale.domain(
@@ -81,10 +101,11 @@ function drawGraph() {
   xScale.domain([
     0,
     d3.max(topOfSortedData, function(d) {
-      return d[data.columns[year]];
+      return d[data.columns[column]];
     })
   ]);
-  if (testi < 1) {
+
+  if (d3.selectAll(".bar").size() < 1) {
     d3.selectAll(".x.axis").remove();
     d3.selectAll(".y.axis").remove();
     g.append("g")
@@ -104,7 +125,6 @@ function drawGraph() {
           return d;
         })
       );
-    testi++;
   } else {
     g.selectAll(".x.axis")
       .transition()
@@ -136,7 +156,7 @@ function drawGraph() {
       return yScale(d.Vaalit);
     })
     .attr("width", function(d) {
-      return xScale(d[data.columns[year]]);
+      return xScale(d[data.columns[column]]);
     })
     .attr("height", yScale.bandwidth())
     .attr("fill", function(d) {
@@ -154,7 +174,7 @@ function drawGraph() {
     .transition()
     .duration(animationSpeed)
     .attr("width", function(d) {
-      return xScale(d[data.columns[year]]);
+      return xScale(d[data.columns[column]]);
     })
     .attr("height", yScale.bandwidth())
     .attr("fill", function(d) {
@@ -183,7 +203,7 @@ function drawGraph() {
     .transition()
     .duration(animationSpeed)
     .attr("x", function(d) {
-      return 5 + xScale(d[data.columns[year]]);
+      return 5 + xScale(d[data.columns[column]]);
     })
     .attr("y", function(d) {
       return yScale(d.Vaalit) + 0.5 * yScale.bandwidth();
@@ -191,7 +211,7 @@ function drawGraph() {
     .tween("text", function(d) {
       let node = this;
       //keep a reference to 'this'
-      let i = d3.interpolateRound(node.textContent, d[data.columns[year]]);
+      let i = d3.interpolateRound(node.textContent, d[data.columns[column]]);
       return function(t) {
         node.textContent = i(t);
         //use that reference in the inner function
@@ -205,7 +225,7 @@ function drawGraph() {
     .attr("class", "label")
     .text(0)
     .attr("x", function(d) {
-      return 5 + xScale(d[data.columns[year]]);
+      return 5 + xScale(d[data.columns[column]]);
     })
     .attr("y", function(d) {
       return yScale(d.Vaalit) + 0.5 * yScale.bandwidth();
@@ -217,7 +237,7 @@ function drawGraph() {
     .tween("text", function(d) {
       let node = this;
       //keep a reference to 'this'
-      let i = d3.interpolateRound(node.textContent, d[data.columns[year]]);
+      let i = d3.interpolateRound(node.textContent, d[data.columns[column]]);
       return function(t) {
         node.textContent = i(t);
         //use that reference in the inner function
@@ -232,5 +252,3 @@ function drawGraph() {
     .attr("y", 1000)
     .remove();
 }
-
-loadData();
