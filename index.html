@@ -12,11 +12,23 @@
         text-align: center;
         font-size: 35px;
       }
+      svg {
+        border: 1px solid black;
+      }
     </style>
     <script src="https://d3js.org/d3.v4.min.js"></script>
   </head>
   <body>
     <div id="settings">
+      <textarea rows="1" cols="25" id="chartTitle">Oletus otsikko:</textarea>
+      <input
+        type="checkbox"
+        id="columnIsColor"
+        name="columnIsColor"
+        value="columnIsColor"
+        checked
+      />
+      2nd column is color<br />
       <textarea rows="4" cols="25" id="csvTextInput"></textarea>
 
       <button onclick="readTextbox()">Create chart</button>
