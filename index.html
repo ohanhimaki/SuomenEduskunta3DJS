@@ -17,15 +17,16 @@
   </head>
   <body>
     <div id="settings">
-      <textarea rows="4" cols="25"></textarea>
+      <textarea rows="4" cols="25" id="csvTextInput"></textarea>
 
-      <button onclick="">Create chart</button>
+      <button onclick="readTextbox()">Create chart</button>
       <input
         type="file"
         id="csvFileInput"
         onchange="readCsv(this)"
         accept=".csv"
       />
+      <button onclick="loadData()">Use example data</button>
     </div>
     <svg width="1000" height="800"></svg>
 

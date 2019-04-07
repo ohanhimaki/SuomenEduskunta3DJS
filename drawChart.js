@@ -40,7 +40,7 @@ let xScale = d3.scaleLinear().range([0, width]);
 //translate changes position where graph is drawn, starts from topleft (x,y)
 let g = svg.append("g").attr("transform", "translate(" + 150 + "," + 100 + ")");
 
-//Load CSV
+//Load exampleCSV
 function loadData() {
   d3.csv("PaikkaJako.csv", function(error, rows) {
     if (error) {
@@ -61,7 +61,7 @@ function loadData() {
     drawGraph();
   });
 }
-//Load csv from imported file
+//Load csv to string from imported file.
 function readCsv(file) {
   let reader = new FileReader();
   reader.onload = function(e) {
@@ -71,8 +71,26 @@ function readCsv(file) {
   reader.readAsBinaryString(file.files[0]);
 }
 
+function readTextbox() {
+  content = document.getElementById("csvTextInput").value;
+  console.log(content);
+  importData(content);
+}
+
+//Parse data with d3 csvparse. strings to int.
 function importData(csv) {
   data = d3.csvParse(csv);
+  data.forEach(function(d) {
+    let i = 0;
+    while (i < data.columns.length) {
+      if (i > 1) {
+        d[data.columns[i]] = +d[data.columns[i]];
+      }
+
+      i++;
+    }
+  });
+
   drawGraph();
 }
 
@@ -85,19 +103,22 @@ function drawGraph() {
     .attr("y", -20)
     .text(titleStart + data.columns[column]);
 
+  //sort data by value
   let datasorted = data.sort(function(a, b) {
     return a[data.columns[column]] - b[data.columns[column]];
   });
-
+  // drop 0 values
   let topOfSortedData = datasorted.filter(function(d) {
     return d[data.columns[column]] != 0;
   });
 
+  //yScale axis titles, returns value of first column from every row in sorted and filtered list
   yScale.domain(
     topOfSortedData.map(function(d) {
-      return d.Vaalit;
+      return d[data.columns[0]];
     })
   );
+  //xScale axis titles: 0, max gives titles from 0 to highest value.
   xScale.domain([
     0,
     d3.max(topOfSortedData, function(d) {
@@ -144,7 +165,7 @@ function drawGraph() {
   let bars = g
     .selectAll(".bar")
     .data(topOfSortedData, function(d) {
-      return d.Vaalit;
+      return d[data.columns[0]];
     })
     .attr("class", "bar");
   // UPDATE BARS
@@ -153,7 +174,7 @@ function drawGraph() {
     .duration(animationSpeed)
     .attr("x", 0)
     .attr("y", function(d) {
-      return yScale(d.Vaalit);
+      return yScale(d[data.columns[0]]);
     })
     .attr("width", function(d) {
       return xScale(d[data.columns[column]]);
@@ -169,7 +190,7 @@ function drawGraph() {
     .attr("class", "bar")
     .attr("x", 0)
     .attr("y", function(d) {
-      return yScale(d.Vaalit);
+      return yScale(d[data.columns[0]]);
     })
     .transition()
     .duration(animationSpeed)
@@ -194,7 +215,7 @@ function drawGraph() {
   let labels = g
     .selectAll(".label")
     .data(topOfSortedData, function(d) {
-      return d.Vaalit;
+      return d[data.columns[0]];
     })
     .attr("class", "label");
 
@@ -206,7 +227,7 @@ function drawGraph() {
       return 5 + xScale(d[data.columns[column]]);
     })
     .attr("y", function(d) {
-      return yScale(d.Vaalit) + 0.5 * yScale.bandwidth();
+      return yScale(d[data.columns[0]]) + 0.5 * yScale.bandwidth();
     })
     .tween("text", function(d) {
       let node = this;
@@ -228,7 +249,7 @@ function drawGraph() {
       return 5 + xScale(d[data.columns[column]]);
     })
     .attr("y", function(d) {
-      return yScale(d.Vaalit) + 0.5 * yScale.bandwidth();
+      return yScale(d[data.columns[0]]) + 0.5 * yScale.bandwidth();
     })
     .attr("dy", ".35em")
     .attr("text-anchor", "start")
